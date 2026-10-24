@@ -1,8 +1,10 @@
 package main
 
 func main() {
+	firstPage := locationAreasURL
 	cfg := &config{
-		commands: getCommands(),
+		commands:         getCommands(),
+		nextLocationsURL: &firstPage,
 	}
 	startRepl(cfg)
 }

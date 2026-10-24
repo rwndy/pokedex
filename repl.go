@@ -8,7 +8,9 @@ import (
 )
 
 type config struct {
-	commands map[string]cliCommand
+	commands         map[string]cliCommand
+	nextLocationsURL *string
+	prevLocationsURL *string
 }
 
 func startRepl(cfg *config) {

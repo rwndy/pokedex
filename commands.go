@@ -24,7 +24,48 @@ func getCommands() map[string]cliCommand {
 			description: "Exit the Pokedex",
 			callback:    commandExit,
 		},
+		"map": {
+			name:        "map",
+			description: "Displays the next 20 location areas",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the previous 20 location areas",
+			callback:    commandMapb,
+		},
 	}
+}
+
+func commandMap(cfg *config) error {
+	if cfg.nextLocationsURL == nil {
+		fmt.Println("you're on the last page")
+		return nil
+	}
+	return showLocationAreas(cfg, *cfg.nextLocationsURL)
+}
+
+func commandMapb(cfg *config) error {
+	if cfg.prevLocationsURL == nil {
+		fmt.Println("you're on the first page")
+		return nil
+	}
+	return showLocationAreas(cfg, *cfg.prevLocationsURL)
+}
+
+func showLocationAreas(cfg *config, pageURL string) error {
+	page, err := fetchLocationAreas(pageURL)
+	if err != nil {
+		return err
+	}
+
+	cfg.nextLocationsURL = page.Next
+	cfg.prevLocationsURL = page.Previous
+
+	for _, area := range page.Results {
+		fmt.Println(area.Name)
+	}
+	return nil
 }
 
 func commandExit(cfg *config) error {
