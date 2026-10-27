@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	pokemonBaseURL      = "https://pokeapi.co/api/v2/pokemon/"
 	locationAreaBaseURL = "https://pokeapi.co/api/v2/location-area/"
 	locationAreasURL    = locationAreaBaseURL + "?offset=0&limit=20"
 )
@@ -36,6 +37,11 @@ type locationAreaResponse struct {
 			URL  string `json:"url"`
 		} `json:"pokemon"`
 	} `json:"pokemon_encounters"`
+}
+
+type pokemon struct {
+	Name           string `json:"name"`
+	BaseExperience int    `json:"base_experience"`
 }
 
 type pokeapiClient struct {
@@ -78,6 +84,19 @@ func (c *pokeapiClient) fetchLocationArea(name string) (locationAreaResponse, er
 		return locationAreaResponse{}, fmt.Errorf("decoding location area %q: %w", name, err)
 	}
 	return area, nil
+}
+
+func (c *pokeapiClient) fetchPokemon(name string) (pokemon, error) {
+	body, err := c.get(pokemonBaseURL + url.PathEscape(name))
+	if err != nil {
+		return pokemon{}, fmt.Errorf("fetching pokemon %q: %w", name, err)
+	}
+
+	var p pokemon
+	if err := json.Unmarshal(body, &p); err != nil {
+		return pokemon{}, fmt.Errorf("decoding pokemon %q: %w", name, err)
+	}
+	return p, nil
 }
 
 func (c *pokeapiClient) get(url string) ([]byte, error) {

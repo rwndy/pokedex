@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"os"
 	"sort"
 )
@@ -39,6 +40,11 @@ func getCommands() map[string]cliCommand {
 			name:        "explore <area_name>",
 			description: "Lists the Pokemon found in a location area",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch <pokemon_name>",
+			description: "Throws a Pokeball at a Pokemon to try to catch it",
+			callback:    commandCatch,
 		},
 	}
 }
@@ -90,6 +96,33 @@ func commandExplore(cfg *config, args ...string) error {
 	for _, enc := range area.PokemonEncounters {
 		fmt.Printf(" - %s\n", enc.Pokemon.Name)
 	}
+	return nil
+}
+
+// catchThreshold sets catch difficulty: a Pokemon is caught when a roll in
+// [0, base experience) lands below it, so higher base experience means
+// lower odds (pikachu ~45%, mewtwo ~16%).
+const catchThreshold = 50
+
+func commandCatch(cfg *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("usage: catch <pokemon_name>")
+	}
+	name := args[0]
+
+	target, err := cfg.pokeapiClient.fetchPokemon(name)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", target.Name)
+	if target.BaseExperience > catchThreshold && rand.IntN(target.BaseExperience) >= catchThreshold {
+		fmt.Printf("%s escaped!\n", target.Name)
+		return nil
+	}
+
+	fmt.Printf("%s was caught!\n", target.Name)
+	cfg.pokedex[target.Name] = target
 	return nil
 }
 

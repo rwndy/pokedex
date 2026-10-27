@@ -11,6 +11,7 @@ func main() {
 		commands:         getCommands(),
 		pokeapiClient:    client,
 		nextLocationsURL: &firstPage,
+		pokedex:          make(map[string]pokemon),
 	}
 	startRepl(cfg)
 }
