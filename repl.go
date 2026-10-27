@@ -34,7 +34,7 @@ func startRepl(cfg *config) {
 			continue
 		}
 
-		if err := command.callback(cfg); err != nil {
+		if err := command.callback(cfg, words[1:]...); err != nil {
 			fmt.Println(err)
 		}
 	}
