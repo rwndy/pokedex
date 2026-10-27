@@ -9,6 +9,7 @@ import (
 
 type config struct {
 	commands         map[string]cliCommand
+	pokeapiClient    *pokeapiClient
 	nextLocationsURL *string
 	prevLocationsURL *string
 }

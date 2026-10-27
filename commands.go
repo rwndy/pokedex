@@ -54,7 +54,7 @@ func commandMapb(cfg *config) error {
 }
 
 func showLocationAreas(cfg *config, pageURL string) error {
-	page, err := fetchLocationAreas(pageURL)
+	page, err := cfg.pokeapiClient.fetchLocationAreas(pageURL)
 	if err != nil {
 		return err
 	}
